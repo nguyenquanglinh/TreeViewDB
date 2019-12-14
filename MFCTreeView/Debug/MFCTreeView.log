@@ -1,0 +1,5 @@
+﻿  ADOConnection.cpp
+c:\users\thang\onedrive\documents\visual studio 2015\projects\mfctreeview\mfctreeview\adoconnection.cpp(28): warning C4101: 'ce': unreferenced local variable
+c:\users\thang\onedrive\documents\visual studio 2015\projects\mfctreeview\mfctreeview\adoconnection.cpp(237): warning C4715: 'ADOConnection::GetDsPhongBan': not all control paths return a value
+  MFCTreeView.vcxproj -> C:\Users\thang\OneDrive\Documents\Visual Studio 2015\Projects\MFCTreeView\Debug\MFCTreeView.exe
+  MFCTreeView.vcxproj -> C:\Users\thang\OneDrive\Documents\Visual Studio 2015\Projects\MFCTreeView\Debug\MFCTreeView.pdb (Partial PDB)

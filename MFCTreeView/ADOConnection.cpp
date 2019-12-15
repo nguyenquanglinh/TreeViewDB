@@ -35,9 +35,16 @@ bool ADOConnection::InsertIntoNhanVien(NhanVien nv)
 {
 	try
 	{
-		_bstr_t ten = "'" + _bstr_t(nv.GetTenNV()) + "'";
+
 		_bstr_t ma = "'" + _bstr_t(nv.GetMaNV()) + "'";
-		_bstr_t strsql("Insert into NhanVien(MaNV,TenNV) Values(" + ma + _bstr_t(",") + ten + ")");
+		_bstr_t ten = ",'" + _bstr_t(nv.GetTenNV()) + "'";
+		_bstr_t strsql;
+		if (nv.GetMaPb() != NULL) {
+			_bstr_t mapb = ",'" + _bstr_t(nv.GetMaPb()) + "'";
+			strsql = "Insert into NhanVien(MaNV,TenNV,MaPb) Values(" + ma + ten + mapb + ")";
+		}
+		else
+			strsql = "Insert into NhanVien(MaNV,TenNV) Values(" + ma + ten + ")";
 		Cmd1->ActiveConnection = this->conn;
 		Cmd1->CommandText = strsql;
 		Cmd1->CommandType = adCmdText;
@@ -210,13 +217,12 @@ vector<PhongBan> ADOConnection::GetDsPhongBan()
 	if (!FAILED(ret.CreateInstance(__uuidof(Recordset))))
 	{
 		ret->Open(strsql, strCon, adOpenStatic, adLockReadOnly, adCmdText);
-		_bstr_t ten;
-		int ma;
-		ret->MoveFirst();
-
 		//Loop through the Record set
 		if (!ret->EndOfFile)
 		{
+			_bstr_t ten;
+			int ma;
+			ret->MoveFirst();
 			while (!ret->EndOfFile)
 			{
 				ma = ret->Fields->GetItem("MaPb")->Value;
@@ -238,38 +244,44 @@ vector<PhongBan> ADOConnection::GetDsPhongBan()
 
 vector<NhanVien> ADOConnection::GetDsNhanVienFromPhongBan(PhongBan pb)
 {
-	_RecordsetPtr ret;
-	_bstr_t ma = "'" + _bstr_t(pb.GetMaPB()) + "'";
-	_bstr_t strsql("select * from NhanVien where MaPb="+ma);
 	vector<NhanVien> t;
-	if (!FAILED(ret.CreateInstance(__uuidof(Recordset))))
-	{
-		ret->Open(strsql, strCon, adOpenStatic, adLockReadOnly, adCmdText);
-		_bstr_t ten;
-		int mapb;
-		int manv;
-		ret->MoveFirst();
-
-		//Loop through the Record set
-		if (!ret->EndOfFile)
+	if (pb.GetMaPB() != NULL) {
+		_RecordsetPtr ret;
+		_bstr_t ma = "'" + _bstr_t(pb.GetMaPB()) + "'";
+		_bstr_t strsql("select * from NhanVien where MaPb=" + ma);
+		if (!FAILED(ret.CreateInstance(__uuidof(Recordset))))
 		{
-			while (!ret->EndOfFile)
+			ret->Open(strsql, strCon, adOpenStatic, adLockReadOnly, adCmdText);
+			//Loop through the Record set
+			if (!ret->EndOfFile)
 			{
-				mapb = ret->Fields->GetItem("MaPb")->Value;
-				ten = ret->Fields->GetItem("TenNV")->Value;
-				manv= ret->Fields->GetItem("MaNV")->Value;
-				t.push_back(NhanVien(manv, (LPCTSTR)ten,mapb));
-				ret->MoveNext();
-			}
-			//return false;
-			//id1.SetWindowTextW(_T("Error creating command instance!!"));
-		}
-		else
-		{
-			//return true;
-		}
+				ret->MoveFirst();
+				_bstr_t ten;
+				int mapb;
+				int manv;
+				while (!ret->EndOfFile)
+				{
 
-		return t;
+					ten = ret->Fields->GetItem("TenNV")->Value;
+					manv = ret->Fields->GetItem("MaNV")->Value;
+					mapb = ret->Fields->GetItem("MaPb")->Value;
+					if (mapb != NULL)
+						t.push_back(NhanVien(manv, (LPCTSTR)ten));
+					else
+					{
+						t.push_back(NhanVien(manv, (LPCTSTR)ten, mapb));
+					}
+					ret->MoveNext();
+				}
+				//return false;
+				//id1.SetWindowTextW(_T("Error creating command instance!!"));
+			}
+			else
+			{
+				//return true;
+			}
+		}
 	}
-	return vector<NhanVien>();
+
+	return t;
 }

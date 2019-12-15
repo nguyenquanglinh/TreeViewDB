@@ -6,8 +6,8 @@ using namespace std;
 class PhongBan
 {
 private:
-	int MaPB;
-	CString TenPB;
+	int MaPB=NULL;
+	CString TenPB=NULL;
 
 public:
 	PhongBan();

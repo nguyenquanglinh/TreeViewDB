@@ -44,7 +44,9 @@ int PhongBan::GetMaPB()
 
 CString PhongBan::toString()
 {
-	return GetTenPB();
+	CString a;
+	a.Format(_T("%d"), GetMaPB());
+	return _T("PB: ") + a + _T(" - ") + GetTenPB();
 }
 
 

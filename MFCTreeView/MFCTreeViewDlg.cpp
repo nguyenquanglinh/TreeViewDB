@@ -44,10 +44,8 @@ BEGIN_MESSAGE_MAP(CMFCTreeViewDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_btnSua, &CMFCTreeViewDlg::OnBnClickedbtnsua)
 	ON_NOTIFY(HDN_ITEMCLICK, 0, &CMFCTreeViewDlg::OnHdnItemclickListvalue)
 	ON_NOTIFY(NM_CLICK, IDC_LISTValue, &CMFCTreeViewDlg::OnNMClickListvalue)
+	ON_BN_CLICKED(IDC_btnXoa, &CMFCTreeViewDlg::OnBnClickedbtnxoa)
 END_MESSAGE_MAP()
-
-
-// CMFCTreeViewDlg message handlers
 
 BOOL CMFCTreeViewDlg::OnInitDialog()
 {
@@ -61,10 +59,6 @@ BOOL CMFCTreeViewDlg::OnInitDialog()
 	//return TRUE; // return TRUE unless you set the focus to a control
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
-
-// If you add a minimize button to your dialog, you will need the code below
-//  to draw the icon.  For MFC applications using the document/view model,
-//  this is automatically done for you by the framework.
 
 void CMFCTreeViewDlg::OnPaint()
 {
@@ -91,8 +85,6 @@ void CMFCTreeViewDlg::OnPaint()
 	}
 }
 
-// The system calls this function to obtain the cursor to display while the user drags
-//  the minimized window.
 HCURSOR CMFCTreeViewDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -222,50 +214,15 @@ void CMFCTreeViewDlg::OnNMClickCarTree(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 }
 
-void CMFCTreeViewDlg::OnNMRClickCarTree(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	CTreeCtrl & tc = m_CarTree;
-	MessageBox(_T("Click"), _T("Thong bao"), MB_OK);
-	//*Get the cursor position for this message *
-	DWORD dwPos = GetMessagePos();
-	//*Convert the co - ords into a CPoint structure *
-	CPoint pt(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
-	CPoint spt;
-	spt = pt;
-	//*convert to screen co - ords for the hittesting to work *
-	tc.ScreenToClient(&spt);
-	UINT test;
-	HTREEITEM hti = tc.HitTest(spt, &test);
-	if (hti != NULL)
-	{
-		//*Is the click atcually *on* the item ? *
-		if (test & TVHT_ONITEM)
-		{
-			MessageBox(_T("HTREEITEM click"), _T("thong bao"), MB_OK);
-		}
-	}
-
-	*pResult = 0;
-}
-
-
-
-void CMFCTreeViewDlg::OnLvnItemchangedListvalue(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	// TODO: Add your control notification handler code here
-	*pResult = 0;
-}
-
 void CMFCTreeViewDlg::OnBnClickedButtonthem()
 {
 	// TODO: Add your control notification handler code here
 	if (GetCheDo() == 1) {//có 2 cột=>bảng pb
-		SuaPB pb;
-		pb.DoModal();
-		if (pb.pb.GetMaPB() != NULL)
+		ThemPb tpb;
+		tpb.DoModal();
+		if (tpb.pb.GetMaPB() != NULL)
 		{
-			//dbFile.InsertIntoPhongBan(pb.pb);
+			dbFile.InsertIntoPhongBan(tpb.pb);
 			Update();
 		}
 
@@ -273,11 +230,11 @@ void CMFCTreeViewDlg::OnBnClickedButtonthem()
 	}
 	else
 	{//them ơ bang nhan vien;
-		ThemNV nv;
-		nv.DoModal();
-		if (nv.nv.GetMaNV() != NULL)
+		ThemNV tnv;
+		tnv.DoModal();
+		if (tnv.nv.GetMaNV() != NULL)
 		{
-			dbFile.InsertIntoNhanVien(nv.nv);
+			dbFile.InsertIntoNhanVien(tnv.nv);
 			Update();
 		}
 	}
@@ -286,12 +243,13 @@ void CMFCTreeViewDlg::OnBnClickedButtonthem()
 void CMFCTreeViewDlg::OnBnClickedbtnsua()
 {
 	// TODO: Add your control notification handler code here
-	if (GetCheDo() == 1) {//có 2 cột=>bảng pb
-		SuaPB pb;
-		pb.DoModal();
-		if (pb.pb.GetMaPB() != NULL)
+	if (GetCheDo() == 1 && pb.GetMaPB() != NULL) {//có 2 cột=>bảng pb
+		SuaPB Spb;
+		//Spb.SetText(pb);
+		Spb.DoModal();
+		if (Spb.pb.GetMaPB() != NULL)
 		{
-			dbFile.InsertIntoPhongBan(pb.pb);
+			dbFile.UpdatePhongBan(pb, Spb.pb);
 			Update();
 		}
 
@@ -299,16 +257,43 @@ void CMFCTreeViewDlg::OnBnClickedbtnsua()
 	}
 	else
 	{//them ơ bang nhan vien;
-		SuaNhanVien nv;
-		nv.DoModal();
-		if (nv.nv.GetMaNV() != NULL)
-		{
-			dbFile.InsertIntoNhanVien(nv.nv);
-			Update();
+		if (nv.GetMaNV() != NULL) {
+			SuaNhanVien Snv;
+			Snv.DoModal();
+			if (Snv.nv.GetMaNV() != NULL)
+			{
+				dbFile.UpdateNhanvVien(nv,Snv.nv);
+				Update();
+			}
 		}
 	}
 }
 
+void CMFCTreeViewDlg::OnBnClickedbtnxoa()
+{
+	// TODO: Add your control notification handler code here
+	if (GetCheDo() == 1)
+	{
+		if (pb.GetMaPB() == NULL)MessageBox(_T("Chưa chọn phòng ban"), _T("Thong bao"), MB_OK);
+		else {
+			int x = MessageBox(_T("ban dang xoa: ") + pb.toString(), _T("Thong bao"), MB_YESNO);
+			if (x == IDYES) {
+				if (dbFile.DeletePhongBan(pb))MessageBox(_T("Xóa thành công"), _T("Thong bao"), MB_YESNO);
+			}
+		}
+	}
+	else
+	{
+		if (nv.GetMaNV() == NULL)MessageBox(_T("Chưa chọn phòng ban"), _T("Thong bao"), MB_OK);
+		else
+		{
+			int x = MessageBox(_T("ban dang xoa: ") + nv.toString(), _T("Thong bao"), MB_YESNO);
+			if (x == IDYES) {
+				if (dbFile.DeleteNhanVien(nv))MessageBox(_T("Xóa thành công"), _T("Thong bao"), MB_YESNO);
+			}
+		}
+	}
+}
 
 void CMFCTreeViewDlg::OnHdnItemclickListvalue(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -344,6 +329,7 @@ void CMFCTreeViewDlg::OnHdnItemclickListvalue(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+//chua hoàn thàn menu text 
 void CMFCTreeViewDlg::OnHdnItemdblclickListvalue(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
@@ -366,27 +352,39 @@ void CMFCTreeViewDlg::OnNMClickListvalue(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
 	POSITION pos = myListView.GetFirstSelectedItemPosition();
-	int selected = -1;
 	if (pos != NULL)
 	{
 		while (pos)
 		{
 			int nItem = myListView.GetNextSelectedItem(pos);
-			selected = nItem + 1;
+			indexSelected = nItem + 1;
 		}
 	}
-	DWORD_PTR  xxx = myListView.GetItemData(selected);
-	TCHAR szBuffer[1024];
-	DWORD cchBuf(1024);
-	LVITEM lvi;
-	lvi.iItem = selected;
-	lvi.iSubItem = 0;
-	lvi.mask = LVIF_TEXT;
-	lvi.pszText = szBuffer;
-	lvi.cchTextMax = cchBuf;
-	myListView.GetItem(&lvi);
-	//returns -1 if not selected;
-	/*int nItem = m_CarTree.GetNextSelectedItem(pos);
-	selected = nItem + 1;*/
+	int cheDo = GetCheDo();
+	if (cheDo == 1) {
+		CString maPB = myListView.GetItemText(0, indexSelected);
+		CString tenPB = myListView.GetItemText(1, indexSelected);
+		pb.SetTenPb(tenPB);
+		pb.SetMaPB(_ttoi(maPB));
+	}
+	else if (cheDo == 2)
+	{
+		CString manv = myListView.GetItemText(0, indexSelected);
+		CString tennv = myListView.GetItemText(1, indexSelected);
+		CString mapb = myListView.GetItemText(2, indexSelected);
+		nv.SetMaNV(_ttoi(manv));
+		try
+		{
+			nv.SetMaPB(_ttoi(mapb));
+		}
+		catch (const std::exception&)
+		{
+			nv.SetMaPB(NULL);
+		}
+		nv.SetMaPB(_ttoi(mapb));
+		nv.SetTenNV(tennv);
+	}
 	*pResult = 0;
 }
+
+

@@ -26,6 +26,9 @@ public:
 private:
 	ADOConnection dbFile;
 	HTREEITEM hItem, hCar;
+	int indexSelected = 0;
+	PhongBan pb;
+	NhanVien nv;
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
@@ -57,4 +60,5 @@ public:
 	afx_msg void OnBnClickedbtnsua();
 	afx_msg void OnHdnItemclickListvalue(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMClickListvalue(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedbtnxoa();
 };

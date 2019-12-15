@@ -14,7 +14,7 @@ IMPLEMENT_DYNAMIC(SuaPB, CDialogEx)
 SuaPB::SuaPB(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_DIALOGSuaPhongBan, pParent)
 {
-
+	
 }
 
 SuaPB::~SuaPB()
@@ -27,6 +27,7 @@ void SuaPB::SetText(PhongBan pb)
 	ma.Format(_T("%d"), pb.GetMaPB());
 	maPb.SetWindowTextW(ma);
 	tenPb.SetWindowTextW(pb.GetTenPB());
+	UpdateData(true);
 }
 
 void SuaPB::DoDataExchange(CDataExchange* pDX)
@@ -35,7 +36,6 @@ void SuaPB::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ma, maPb);
 	DDX_Control(pDX, IDC_EDIT_ten, tenPb);
 }
-
 
 BEGIN_MESSAGE_MAP(SuaPB, CDialogEx)
 	ON_BN_CLICKED(IDOK, &SuaPB::OnBnClickedOk)
